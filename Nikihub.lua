@@ -1,3 +1,4 @@
+
 local plr = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local savedCFrame, returnCFrame, spam, flying = nil, nil, false, false
@@ -32,7 +33,7 @@ local toggleBtn = Instance.new("ImageButton", screen)
 toggleBtn.Size = UDim2.new(0, 140, 0, 40)
 toggleBtn.Position = UDim2.new(0, 20, 0, 80)
 toggleBtn.BackgroundTransparency = 1
-toggleBtn.Image = "rbxassetid://15697920794" -- 👈 כפתור NikiHub
+toggleBtn.Image = "rbxassetid://15697920794"
 
 -- Main HUD
 local win = Instance.new("Frame", screen)
@@ -128,9 +129,16 @@ addButton("🚀 Teleport to Saved", function()
 end)
 addButton("🏠 Enter Base", function()
 	local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-	if hrp then hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -3) end
+	if hrp then
+		local original = hrp.CFrame
+		hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -3)
+		task.delay(2, function()
+			hrp.CFrame = original
+		end)
+	end
 end)
 
+-- Combat
 addHeader("Combat")
 addButton("🛡️ Anti‑Hit", function()
 	local hum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
@@ -149,7 +157,46 @@ addButton("✈️ Fly", function()
 		if v then v:Destroy() end
 	end
 end)
+addButton("👻 Invisible", function()
+	local char = plr.Character
+	if not char then return end
+	for _, part in pairs(char:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.Transparency = 1
+		elseif part:IsA("Decal") then
+			part.Transparency = 1
+		end
+	end
+end)
 
+local noclipActive = false
+addButton("🚪 Noclip (Toggle)", function()
+	noclipActive = not noclipActive
+	if noclipActive then
+		game:GetService("RunService").Stepped:Connect(function()
+			if noclipActive and plr.Character then
+				for _, part in pairs(plr.Character:GetDescendants()) do
+					if part:IsA("BasePart") then
+						part.CanCollide = false
+					end
+				end
+			end
+		end)
+	end
+end)
+
+-- Footer
+local footer = Instance.new("TextLabel", win)
+footer.Size = UDim2.new(1, 0, 0, 20)
+footer.Position = UDim2.new(0, 0, 1, -20)
+footer.BackgroundTransparency = 1
+footer.Text = "Made by niki"
+footer.Font = Enum.Font.Gotham
+footer.TextSize = 12
+footer.TextColor3 = Color3.fromRGB(180, 180, 180)
+footer.TextXAlignment = Enum.TextXAlignment.Center
+
+-- SPAM
 addHeader("Spam")
 addButton("📡 Spam Teleport", function()
 	if not savedCFrame then return end
@@ -180,6 +227,7 @@ addButton("🔁 Spam x100", function()
 end)
 addButton("❌ Stop Spam", function() spam = false end)
 
+-- UTILITY
 addHeader("Utility")
 addButton("🕒 Anti‑AFK", function()
 	local vu = game:GetService("VirtualUser")
@@ -190,7 +238,7 @@ addButton("🕒 Anti‑AFK", function()
 	end)
 end)
 
--- Footer
+-- FOOTER
 local footer = Instance.new("TextLabel", win)
 footer.Size = UDim2.new(1, 0, 0, 20)
 footer.Position = UDim2.new(0, 0, 1, -20)
