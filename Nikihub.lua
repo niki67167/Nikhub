@@ -2,10 +2,8 @@ local plr = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local savedCFrame, returnCFrame, spam, flying = nil, nil, false, false
 
--- INTRO עם טקסט Outline
 local intro = Instance.new("ScreenGui", game:GetService("CoreGui"))
 intro.Name = "NikiHubIntro"
-
 local label = Instance.new("TextLabel", intro)
 label.Size = UDim2.new(1, 0, 1, 0)
 label.BackgroundTransparency = 1
@@ -23,18 +21,15 @@ TweenService:Create(label, TweenInfo.new(0.6), {TextTransparency = 1}):Play()
 task.wait(0.6)
 intro:Destroy()
 
--- GUI ROOT
 local screen = Instance.new("ScreenGui", game:GetService("CoreGui"))
 screen.Name = "NikihubHUD"
 
--- Toggle button (Image)
 local toggleBtn = Instance.new("ImageButton", screen)
 toggleBtn.Size = UDim2.new(0, 140, 0, 40)
 toggleBtn.Position = UDim2.new(0, 20, 0, 80)
 toggleBtn.BackgroundTransparency = 1
 toggleBtn.Image = "rbxassetid://15697920794"
 
--- Main HUD
 local win = Instance.new("Frame", screen)
 win.Size = UDim2.new(0, 260, 0, 440)
 win.Position = UDim2.new(0, 0, 0, 140)
@@ -45,7 +40,6 @@ win.Active = true
 win.Draggable = true
 win.Visible = false
 
--- Title
 local title = Instance.new("TextLabel", win)
 title.Size = UDim2.new(1, 0, 0, 30)
 title.Text = "🌟 NikiHub"
@@ -54,7 +48,6 @@ title.TextSize = 16
 title.TextColor3 = Color3.new(1,1,1)
 title.BackgroundTransparency = 1
 
--- Scroll content
 local scroll = Instance.new("ScrollingFrame", win)
 scroll.Size = UDim2.new(1, 0, 1, -60)
 scroll.Position = UDim2.new(0, 0, 0, 30)
@@ -69,7 +62,6 @@ layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 20)
 end)
 
--- Helpers
 local function addHeader(txt)
 	local l = Instance.new("TextLabel", scroll)
 	l.Size = UDim2.new(1, -10, 0, 24)
@@ -95,7 +87,6 @@ local function addButton(txt, func)
 	return b
 end
 
--- Open/Close logic
 local function openGUI()
 	win.Visible = true
 	TweenService:Create(win, TweenInfo.new(0.3), {BackgroundTransparency = 0.25}):Play()
@@ -114,12 +105,10 @@ toggleBtn.MouseButton1Click:Connect(function()
 	if guiOpen then openGUI() else closeGUI() end
 end)
 
--- Auto open after intro
 task.wait(0.1)
 guiOpen = true
 openGUI()
 
--- Sections
 addHeader("Teleport")
 addButton("📍 Save Position", function()
 	local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
@@ -141,19 +130,6 @@ addButton("🏠 Enter Base", function()
 	end
 end)
 
-addButton("📍 Save Position", function()
-	local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-	if hrp then savedCFrame = hrp.CFrame end
-end)
-addButton("🚀 Teleport to Saved", function()
-	local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-	if hrp and savedCFrame then hrp.CFrame = savedCFrame end
-end)
-
-	end
-end)
-
--- Combat
 addHeader("Combat")
 addButton("🛡️ Anti‑Hit", function()
 	local hum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
@@ -203,18 +179,6 @@ addButton("🚪 Noclip (Toggle)", function()
 	end
 end)
 
--- Footer
-local footer = Instance.new("TextLabel", win)
-footer.Size = UDim2.new(1, 0, 0, 20)
-footer.Position = UDim2.new(0, 0, 1, -20)
-footer.BackgroundTransparency = 1
-footer.Text = "Made by niki"
-footer.Font = Enum.Font.Gotham
-footer.TextSize = 12
-footer.TextColor3 = Color3.fromRGB(180, 180, 180)
-footer.TextXAlignment = Enum.TextXAlignment.Center
-
--- SPAM
 addHeader("Spam")
 addButton("📡 Spam Teleport", function()
 	if not savedCFrame then return end
@@ -245,7 +209,6 @@ addButton("🔁 Spam x100", function()
 end)
 addButton("❌ Stop Spam", function() spam = false end)
 
--- UTILITY
 addHeader("Utility")
 addButton("🕒 Anti‑AFK", function()
 	local vu = game:GetService("VirtualUser")
@@ -256,18 +219,6 @@ addButton("🕒 Anti‑AFK", function()
 	end)
 end)
 
--- FOOTER
-local footer = Instance.new("TextLabel", win)
-footer.Size = UDim2.new(1, 0, 0, 20)
-footer.Position = UDim2.new(0, 0, 1, -20)
-footer.BackgroundTransparency = 1
-footer.Text = "Made by niki"
-footer.Font = Enum.Font.Gotham
-footer.TextSize = 12
-footer.TextColor3 = Color3.fromRGB(180, 180, 180)
-footer.TextXAlignment = Enum.TextXAlignment.Center
-
--- SPEED BOOSTS
 addHeader("Speed")
 addButton("🏃 Speed Boost (Normal)", function()
 	local char = plr.Character
@@ -282,16 +233,13 @@ addButton("💨 Speed Boost (Exclusive)", function()
 	if hum then hum.WalkSpeed = 80 end
 end)
 
--- DESYNC
 addHeader("Desync")
 addButton("🌀 Add new desync (no cloner)", function()
 	local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
 	if not hrp then return end
 	local fakePos = hrp.Position
-
 	local attachment = Instance.new("Attachment", hrp)
-	attachment.Position = Vector3.new(0, -1000, 0) -- move you visually away
-
+	attachment.Position = Vector3.new(0, -1000, 0)
 	task.spawn(function()
 		while hrp and hrp.Parent and attachment do
 			hrp.Velocity = Vector3.zero
