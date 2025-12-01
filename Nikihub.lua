@@ -1,4 +1,3 @@
-
 local plr = game.Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local savedCFrame, returnCFrame, spam, flying = nil, nil, false, false
@@ -66,6 +65,9 @@ scroll.BackgroundTransparency = 1
 local layout = Instance.new("UIListLayout", scroll)
 layout.Padding = UDim.new(0, 4)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 20)
+end)
 
 -- Helpers
 local function addHeader(txt)
@@ -128,13 +130,26 @@ addButton("🚀 Teleport to Saved", function()
 	if hrp and savedCFrame then hrp.CFrame = savedCFrame end
 end)
 addButton("🏠 Enter Base", function()
+	if not savedCFrame then return end
 	local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
 	if hrp then
 		local original = hrp.CFrame
-		hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -3)
+		hrp.CFrame = savedCFrame
 		task.delay(2, function()
-			hrp.CFrame = original
+			if hrp then hrp.CFrame = original end
 		end)
+	end
+end)
+
+addButton("📍 Save Position", function()
+	local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+	if hrp then savedCFrame = hrp.CFrame end
+end)
+addButton("🚀 Teleport to Saved", function()
+	local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+	if hrp and savedCFrame then hrp.CFrame = savedCFrame end
+end)
+
 	end
 end)
 
@@ -157,14 +172,17 @@ addButton("✈️ Fly", function()
 		if v then v:Destroy() end
 	end
 end)
-addButton("👻 Invisible", function()
+local invisible = false
+addButton("👻 Invisible (Toggle)", function()
+	invisible = not invisible
 	local char = plr.Character
 	if not char then return end
 	for _, part in pairs(char:GetDescendants()) do
 		if part:IsA("BasePart") then
-			part.Transparency = 1
+			part.Transparency = invisible and 1 or 0
+			part.CanCollide = not invisible
 		elseif part:IsA("Decal") then
-			part.Transparency = 1
+			part.Transparency = invisible and 1 or 0
 		end
 	end
 end)
@@ -248,3 +266,37 @@ footer.Font = Enum.Font.Gotham
 footer.TextSize = 12
 footer.TextColor3 = Color3.fromRGB(180, 180, 180)
 footer.TextXAlignment = Enum.TextXAlignment.Center
+
+-- SPEED BOOSTS
+addHeader("Speed")
+addButton("🏃 Speed Boost (Normal)", function()
+	local char = plr.Character
+	if not char then return end
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if hum then hum.WalkSpeed = 24 end
+end)
+addButton("💨 Speed Boost (Exclusive)", function()
+	local char = plr.Character
+	if not char then return end
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if hum then hum.WalkSpeed = 80 end
+end)
+
+-- DESYNC
+addHeader("Desync")
+addButton("🌀 Add new desync (no cloner)", function()
+	local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+	local fakePos = hrp.Position
+
+	local attachment = Instance.new("Attachment", hrp)
+	attachment.Position = Vector3.new(0, -1000, 0) -- move you visually away
+
+	task.spawn(function()
+		while hrp and hrp.Parent and attachment do
+			hrp.Velocity = Vector3.zero
+			hrp.CFrame = CFrame.new(fakePos)
+			task.wait(0.1)
+		end
+	end)
+end)
